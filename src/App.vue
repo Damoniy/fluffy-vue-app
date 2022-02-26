@@ -1,60 +1,80 @@
 <template>
-  <div id="app">
-    <img src="./assets/logo.png">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
+  <div class="body">
+    <h1 class="title">{{ title }}</h1>
+    
+    <input type="search" class="search-box"  v-on:input="filter = $event.target.value" placeholder="Filtrar por nome">
+    {{ filter }}
+    <ul class="photo_list">
+      <li class="list_item" v-for="foto in photosWithFilter" :key="foto.id">
+        <panel :title="foto.titulo">
+            <img class="img" :src="foto.url" :alt="foto.description">
+        </panel>
+      </li>
     </ul>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'app',
-  data () {
-    return {
-      msg: 'Welcome to Your Vue.js App'
+  import Panel from './components/shared/panel/Panel.vue';
+  export default {
+    components: {
+      'panel': Panel
+    },
+    data() {
+      return {
+        title: 'Grayscale RPG',
+        fotos: [],
+        filter: ''
+      }
+    },
+    computed: {
+      photosWithFilter() {
+        if(this.filter) {
+          let exp = new RegExp(this.filter.trim(), 'i')
+          return this.fotos.filter(foto => exp.test(foto.titulo));
+        } else {
+          return this.fotos
+        }
+      }
+    },
+    created() {
+      this.$http.get('http://localhost:3000/v1/fotos')
+      .then(response => response.json())
+      .then(fotos => this.fotos = fotos, err => console.log(err))
     }
   }
-}
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style scoped>
+  .body {
+    width: 96%;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+  }
 
-h1, h2 {
-  font-weight: normal;
-}
+  .title {
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+  }
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
+  .photo_list {
+    list-style: none;
+  }
 
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
+  .photo_list .list_item {
+    display: inline-block;
+  }
 
-a {
-  color: #42b983;
-}
+  .search-box {
+    display: block;
+    width: 65%;
+    margin: 0 auto;
+  }
+
+  .img {
+    height: 12em;
+    width: 100%;
+    border-radius: 10px;
+  }
 </style>
