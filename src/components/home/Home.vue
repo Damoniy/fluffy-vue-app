@@ -1,13 +1,16 @@
 <template>
   <div>
     <h1 class="title">{{ title }}</h1>
-    
+
     <input type="search" class="search-box" @input="filter = $event.target.value" placeholder="Filtrar por nome">
     {{ filter }}
     <ul class="photo_list">
       <li class="list_item" v-for="foto in photosWithFilter" :key="foto.id">
         <panel :title="foto.titulo">
-          <image-file :url="foto.url" :titulo="foto.titulo" /> 
+          <image-file :url="foto.url" :titulo="foto.titulo" />
+          <btn type="button" label="Adicionar" btnStyle="default"></btn>
+          <btn type="button" label="Editar" btnStyle="default"></btn>
+          <btn type="button" label="Remover" :confirmation="true" btnStyle="remove" @buttonEvent="remove(foto)"></btn>
         </panel>
       </li>
     </ul>
@@ -17,12 +20,16 @@
 <script>
   import Panel from '../shared/panel/Panel.vue';
   import Image from '../shared/image/Image.vue';
+  import Button from '../shared/button/Button.vue'
 
   export default {
     components: {
       'panel': Panel,
-      'image-file': Image
+      'image-file': Image,
+      'btn' : Button
+
     },
+
     data() {
       return {
         title: 'Grayscale RPG',
@@ -30,6 +37,7 @@
         filter: ''
       }
     },
+
     computed: {
       photosWithFilter() {
         if(this.filter) {
@@ -40,6 +48,13 @@
         }
       }
     },
+
+    methods: {
+      remove(foto) {
+        alert("A foto " + foto.titulo + " foi removida!");
+      }
+    },
+
     created() {
       this.$http.get('http://localhost:3000/v1/fotos')
       .then(response => response.json())

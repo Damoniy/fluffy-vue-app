@@ -1,27 +1,24 @@
 <template>
   <div class="body">
-    <nav>
-      <ul>
-        
-        <li v-for="route in routes" :key="route.path">
-          <router-link :to="route.path ? route.path : '/'">{{ route.title }}</router-link>
-        </li>
-
-      </ul>
-    </nav>
-    <router-view></router-view>
+    <meu-menu :routes='routes'/>
+    <transition name="page">
+      <router-view></router-view>
+    </transition>
   </div>
 </template>
 
 <script>
-
 import { routes } from './routes'
+import Menu from './components/shared/menu/Menu.vue'
 
 export default {
 
+  components: {
+    'meu-menu': Menu
+  },
   data() {
     return {
-        routes
+        routes,
       }
   }
 
@@ -34,5 +31,13 @@ export default {
     display: flex;
     flex-direction: column;
     text-align: center;
+  }
+
+  .page-enter, .page-leave-active {
+    opacity: 0;
+  }
+
+  .page-enter-active, .page-leave-active {
+    transition: opacity 900ms;
   }
 </style>
